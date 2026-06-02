@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using SantaClauzer.BL.Repositories;
+using SantaClauzer.BL.Services;
 using SantaClauzer.Database.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IPresentGroupRepository, PresentGroupRepository>();
+builder.Services.AddScoped<IPresentGroupService, PresentGroupService>();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -32,6 +37,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.MapOpenApi();
 }
+
+// Map attribute-routed controllers so api/[controller] endpoints are registered
+app.MapControllers();
 
 app.MapDefaultEndpoints();
 

@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SantaClauzer.Database\SantaClauzer.Database.csproj" />
     <ProjectReference Include="..\SantaClauzer.Model\SantaClauzer.Model.csproj" />
   </ItemGroup>
