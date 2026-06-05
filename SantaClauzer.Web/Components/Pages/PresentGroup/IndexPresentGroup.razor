@@ -1,0 +1,17 @@
+﻿@page "/present-groups"
+
+<h3>Present Groups</h3>
+
+@if (PresentGroupModels == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var group in PresentGroupModels)
+        {
+            <li>@group.Name</li>
+        }
+    </ul>
+}

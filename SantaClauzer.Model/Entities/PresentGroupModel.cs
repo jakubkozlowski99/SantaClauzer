@@ -12,7 +12,6 @@ namespace SantaClauzer.Model.Entities
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int CreatorId { get; set; }
-        public List<int> MemberIds { get; set; } = new List<int>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int Budget { get; set; }
 

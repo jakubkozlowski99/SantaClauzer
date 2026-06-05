@@ -12,7 +12,7 @@ using SantaClauzer.Database.Data;
 namespace SantaClauzer.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260601151529_init")]
+    [Migration("20260605103507_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -43,10 +43,6 @@ namespace SantaClauzer.Database.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.PrimitiveCollection<string>("MemberIds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
