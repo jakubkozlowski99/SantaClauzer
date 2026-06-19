@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using SantaClauzer.Web.Services
+@using Microsoft.AspNetCore.Components.Routing
+@inject NotificationState NotificationState
+@inject NavigationManager NavigationManager
 
 <div class="page">
     <div class="sidebar">
@@ -16,8 +20,9 @@
     </main>
 </div>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+<!-- interactive host component renders inside layout and handles toast UI -->
+<ToastHost />
+
+@code {
+    // layout no longer needs to be interactive; toast handling lives in ToastHost
+}

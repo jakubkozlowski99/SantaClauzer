@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using SantaClauzer.BL.Services;
+using SantaClauzer.Model.Entities;
 using SantaClauzer.Model.Models;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
@@ -26,6 +27,13 @@ namespace SantaClauzer.ApiService.Controllers
                 Success = true,
                 Data = presentGroups
             });
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BaseResponseModel>> CreatePresentGroup(PresentGroupModel model)
+        {
+            await _presentGroupService.CreatePresentGroup(model);
+            return Ok(new BaseResponseModel { Success = true });
         }
     }
 }

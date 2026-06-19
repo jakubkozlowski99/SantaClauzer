@@ -1,5 +1,6 @@
 using SantaClauzer.Web;
 using SantaClauzer.Web.Components;
+using SantaClauzer.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,11 +11,13 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped<NotificationState>();
+
 builder.Services.AddOutputCache();
 
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
-        client.BaseAddress = new Uri("https://localhost:7422");
+        client.BaseAddress = new("https+http://localhost:7422");
     });
 
 var app = builder.Build();

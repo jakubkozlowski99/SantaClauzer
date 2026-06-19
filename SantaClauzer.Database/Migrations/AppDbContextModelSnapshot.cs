@@ -49,7 +49,7 @@ namespace SantaClauzer.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PresentGroups");
+                    b.ToTable("PresentGroups", (string)null);
                 });
 
             modelBuilder.Entity("SantaClauzer.Model.Entities.WishListModel", b =>
@@ -72,7 +72,7 @@ namespace SantaClauzer.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WishLists");
+                    b.ToTable("WishLists", (string)null);
                 });
 #pragma warning restore 612, 618
         }
