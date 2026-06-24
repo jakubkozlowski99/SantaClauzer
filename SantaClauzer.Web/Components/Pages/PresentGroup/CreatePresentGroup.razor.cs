@@ -5,7 +5,7 @@ using SantaClauzer.Web.Services;
 
 namespace SantaClauzer.Web.Components.Pages.PresentGroup
 {
-    public partial class CreatePresentGroup
+    public partial class CreatePresentGroup : ComponentBase
     {
         public PresentGroupModel Model { get; set; } = new();
 

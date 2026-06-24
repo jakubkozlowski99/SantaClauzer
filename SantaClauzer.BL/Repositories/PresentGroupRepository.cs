@@ -13,6 +13,8 @@ namespace SantaClauzer.BL.Repositories
     {
         Task<List<PresentGroupModel>> GetPresentGroups();
         Task<PresentGroupModel> CreatePresentGroup(PresentGroupModel model);
+        Task<PresentGroupModel> GetPresentGroup(int id);
+        Task<PresentGroupModel> UpdatePresentGroup(PresentGroupModel model);
     }
 
     public class PresentGroupRepository : IPresentGroupRepository
@@ -32,6 +34,18 @@ namespace SantaClauzer.BL.Repositories
         public async Task<PresentGroupModel> CreatePresentGroup(PresentGroupModel model)
         {
             await _appDbContext.PresentGroups.AddAsync(model);
+            await _appDbContext.SaveChangesAsync();
+            return model;
+        }
+
+        public async Task<PresentGroupModel> GetPresentGroup(int id)
+        {
+            return await _appDbContext.PresentGroups.FindAsync(id);
+        }
+        
+        public async Task<PresentGroupModel> UpdatePresentGroup(PresentGroupModel model)
+        {
+            _appDbContext.PresentGroups.Update(model);
             await _appDbContext.SaveChangesAsync();
             return model;
         }

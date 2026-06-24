@@ -5,7 +5,7 @@ using SantaClauzer.Model.Models;
 
 namespace SantaClauzer.Web.Components.Pages.PresentGroup
 {
-    public partial class IndexPresentGroup
+    public partial class IndexPresentGroup : ComponentBase
     {
         [Inject]
         public ApiClient apiClient { get; set; } = default!;

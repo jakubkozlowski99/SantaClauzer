@@ -35,5 +35,33 @@ namespace SantaClauzer.ApiService.Controllers
             await _presentGroupService.CreatePresentGroup(model);
             return Ok(new BaseResponseModel { Success = true });
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BaseResponseModel>> GetPresentGroup(int id)
+        {
+            var presentGroup = await _presentGroupService.GetPresentGroup(id);
+            if (presentGroup == null)
+            {
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Present group not found." });
+            }
+            return Ok(new BaseResponseModel { Success = true, Data = presentGroup });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<BaseResponseModel>> UpdatePresentGroup(int id, PresentGroupModel model)
+        {
+            var existingPresentGroup = await _presentGroupService.GetPresentGroup(id);
+
+            if (existingPresentGroup == null)
+            {
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Present group not found." });
+            }
+
+            // Update the properties of the existing present group
+            existingPresentGroup.Name = model.Name;
+            existingPresentGroup.Description = model.Description;
+            await _presentGroupService.UpdatePresentGroup(id, existingPresentGroup);
+            return Ok(new BaseResponseModel { Success = true });
+        }
     }
 }

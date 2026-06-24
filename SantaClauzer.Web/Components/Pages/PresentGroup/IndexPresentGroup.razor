@@ -13,6 +13,10 @@ else
         @foreach (var group in PresentGroupModels)
         {
             <li>@group.Name</li>
+            <li>
+                <a class="btn btn-secondary" href="/present-groups/update/@group.Id">Update</a>
+                <a class="btn btn-danger" href="/present-groups/delete/@group.Id">Delete</a>
+            </li>
         }
     </ul>
 }

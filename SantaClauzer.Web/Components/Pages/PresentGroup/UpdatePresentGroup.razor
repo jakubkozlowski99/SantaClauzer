@@ -1,0 +1,30 @@
+﻿@page "/present-groups/update/{Id:int}"
+<h3>UpdatePresentGroup</h3>
+@rendermode InteractiveServer
+
+<EditForm OnValidSubmit="Submit" Model="Model">
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Nazwa grupy</label>
+                <InputText id="name" class="form-control" @bind-Value="Model.Name" />
+                <ValidationMessage For="() => Model.Name"></ValidationMessage>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="description" class="form-label">Opis grupy</label>
+                <InputTextArea id="description" class="form-control" @bind-Value="Model.Description" />
+                <ValidationMessage For="() => Model.Description"></ValidationMessage>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Budżet na prezent</label>
+                <InputNumber id="budget" class="form-control" @bind-Value="Model.Budget"></InputNumber>
+                <ValidationMessage For="() => Model.Budget"></ValidationMessage>
+            </div>
+        </div>
+        <button class="btn btn-secondary" type="submit">Stwórz</button>
+    </div>
+</EditForm>
