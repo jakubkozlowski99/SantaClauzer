@@ -14,6 +14,7 @@ namespace SantaClauzer.BL.Services
         Task CreatePresentGroup(PresentGroupModel model);
         Task<PresentGroupModel> GetPresentGroup(int id);
         Task UpdatePresentGroup(int id, PresentGroupModel model);
+        Task DeletePresentGroup(int id);
     }
 
     public class PresentGroupService : IPresentGroupService
@@ -47,6 +48,15 @@ namespace SantaClauzer.BL.Services
                 existingPresentGroup.Description = model.Description;
                 // Update other properties as needed
                 await _presentGroupRepository.UpdatePresentGroup(existingPresentGroup);
+            }
+        }
+        public async Task DeletePresentGroup(int id)
+        {
+            var existingPresentGroup = await _presentGroupRepository.GetPresentGroup(id);
+            if (existingPresentGroup != null)
+            {
+                // Assuming you have a method to delete the present group in the repository
+                await _presentGroupRepository.DeletePresentGroup(existingPresentGroup);
             }
         }
     }

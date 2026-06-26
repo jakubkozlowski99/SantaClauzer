@@ -30,4 +30,14 @@ public class ApiClient(HttpClient httpClient)
         }
         return default;
     }
+
+    public async Task<T1> DeleteAsync<T1>(string path)
+    {
+        var res = await httpClient.DeleteAsync(path);
+        if (res != null && res.IsSuccessStatusCode)
+        {
+            return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+        }
+        return default;
+    }
 }

@@ -63,5 +63,17 @@ namespace SantaClauzer.ApiService.Controllers
             await _presentGroupService.UpdatePresentGroup(id, existingPresentGroup);
             return Ok(new BaseResponseModel { Success = true });
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<BaseResponseModel>> DeletePresentGroup(int id)
+        {
+            var existingPresentGroup = await _presentGroupService.GetPresentGroup(id);
+            if (existingPresentGroup == null)
+            {
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Present group not found." });
+            }
+            await _presentGroupService.DeletePresentGroup(id);
+            return Ok(new BaseResponseModel { Success = true });
+        }
     }
 }
