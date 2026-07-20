@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using SantaClauzer.Web;
+using SantaClauzer.Web.Authentication;
 using SantaClauzer.Web.Components;
 using SantaClauzer.Web.Services;
 
@@ -13,7 +15,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped<NotificationState>();
 
+builder.Services.AddAuthentication();
+builder.Services.AddCascadingAuthenticationState();
+
 builder.Services.AddOutputCache();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
@@ -32,6 +38,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseOutputCache();
 
