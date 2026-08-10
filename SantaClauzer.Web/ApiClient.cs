@@ -1,17 +1,40 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Newtonsoft.Json;
+using SantaClauzer.Model.Models;
+using SantaClauzer.Web.Authentication;
 using System.Net.Http.Headers;
 
 namespace SantaClauzer.Web;
 
-public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage)
+public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage, AuthenticationStateProvider authStateProvider)
 {
     public async Task SetAuthorizeHeader()
     {
-        var token = (await localStorage.GetAsync<string>("authToken")).Value;
-        if (!string.IsNullOrEmpty(token))
+        var sessionState = (await localStorage.GetAsync<LoginResponseModel>("sessionState")).Value;
+        if (sessionState != null && !string.IsNullOrEmpty(sessionState.Token))
         {
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            if (sessionState.TokenExpired < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                await ((CustomAuthStateProvider)authStateProvider).MarkUserAsLoggedOut();
+            }
+            else if (sessionState.TokenExpired < DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds())
+            {
+                var res = await httpClient.GetFromJsonAsync<LoginResponseModel>($"api/auth/loginByRefreshToken?refreshToken={sessionState.RefreshToken}");
+                if (res != null && !string.IsNullOrEmpty(res.Token))
+                {
+                    await ((CustomAuthStateProvider)authStateProvider).MarkUserAsAuthenticated(res);
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", res.Token);
+                }
+                else
+                {
+                    await ((CustomAuthStateProvider)authStateProvider).MarkUserAsLoggedOut();
+                }
+            }
+            else
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.Token);
+            }
         }
     }
 

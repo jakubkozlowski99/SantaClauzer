@@ -32,7 +32,7 @@
         var result = await ApiClient.PostAsync<LoginResponseModel, LoginModel>("api/auth/login", loginModel);
         if (result != null && result.Token != null)
         {
-            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result.Token);
+            await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result);
             Navigation.NavigateTo("/");
         }
     }

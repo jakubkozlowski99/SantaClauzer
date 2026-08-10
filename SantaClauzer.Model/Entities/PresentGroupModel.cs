@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SantaClauzer.Model.Entities
 {
@@ -11,9 +8,14 @@ namespace SantaClauzer.Model.Entities
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int CreatorId { get; set; }
+
+        // make nullable to accept existing orphans until you reconcile them
+        public int? CreatorId { get; set; }
+        public UserModel? Creator { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int Budget { get; set; }
 
+        public ICollection<WishListModel> WishLists { get; set; } = new List<WishListModel>();
     }
 }

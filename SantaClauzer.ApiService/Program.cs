@@ -62,6 +62,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPresentGroupRepository, PresentGroupRepository>();
 builder.Services.AddScoped<IPresentGroupService, PresentGroupService>();
 
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // Add services to the container.
 builder.Services.AddProblemDetails();
 

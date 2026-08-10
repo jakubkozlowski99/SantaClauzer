@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SantaClauzer.Database.Data;
 
@@ -11,9 +12,11 @@ using SantaClauzer.Database.Data;
 namespace SantaClauzer.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260810085911_AddedUsers-RefreshToken-UserRole-tables")]
+    partial class AddedUsersRefreshTokenUserRoletables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace SantaClauzer.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CreatorId")
+                    b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -46,8 +49,6 @@ namespace SantaClauzer.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatorId");
 
                     b.ToTable("PresentGroups");
                 });
@@ -63,17 +64,15 @@ namespace SantaClauzer.Database.Migrations
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserModelId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserModelId");
 
                     b.ToTable("RefreshTokens");
                 });
@@ -165,31 +164,11 @@ namespace SantaClauzer.Database.Migrations
                     b.ToTable("WishLists");
                 });
 
-            modelBuilder.Entity("SantaClauzer.Model.Entities.PresentGroupModel", b =>
-                {
-                    b.HasOne("SantaClauzer.Model.Entities.UserModel", "Creator")
-                        .WithMany("PresentGroups")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Creator");
-                });
-
             modelBuilder.Entity("SantaClauzer.Model.Entities.RefreshTokenModel", b =>
                 {
-                    b.HasOne("SantaClauzer.Model.Entities.RoleModel", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId");
-
-                    b.HasOne("SantaClauzer.Model.Entities.UserModel", "User")
+                    b.HasOne("SantaClauzer.Model.Entities.UserModel", null)
                         .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
+                        .HasForeignKey("UserModelId");
                 });
 
             modelBuilder.Entity("SantaClauzer.Model.Entities.UserRoleModel", b =>
@@ -214,7 +193,7 @@ namespace SantaClauzer.Database.Migrations
             modelBuilder.Entity("SantaClauzer.Model.Entities.WishListModel", b =>
                 {
                     b.HasOne("SantaClauzer.Model.Entities.PresentGroupModel", "PresentGroup")
-                        .WithMany("WishLists")
+                        .WithMany()
                         .HasForeignKey("PresentGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -230,11 +209,6 @@ namespace SantaClauzer.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SantaClauzer.Model.Entities.PresentGroupModel", b =>
-                {
-                    b.Navigation("WishLists");
-                });
-
             modelBuilder.Entity("SantaClauzer.Model.Entities.RoleModel", b =>
                 {
                     b.Navigation("UserRoles");
@@ -242,8 +216,6 @@ namespace SantaClauzer.Database.Migrations
 
             modelBuilder.Entity("SantaClauzer.Model.Entities.UserModel", b =>
                 {
-                    b.Navigation("PresentGroups");
-
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("UserRoles");
