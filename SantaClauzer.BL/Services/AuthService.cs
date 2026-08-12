@@ -11,9 +11,9 @@ namespace SantaClauzer.BL.Services
 {
     public interface IAuthService
     {
-        Task<UserModel> GetUserByLogin(string username, string password);
         Task AddRefreshTokenModel(RefreshTokenModel refreshToken);
         Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken);
+        Task<UserModel> GetUserByLogin(string username, string password);
     }
     public class AuthService(IAuthRepository authRepository) : IAuthService
     {

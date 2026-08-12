@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using SantaClauzer.BL.Repositories;
 using SantaClauzer.BL.Services;
 using SantaClauzer.Database.Data;
+using SantaClauzer.Database.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,12 @@ builder.Services.AddScoped<IPresentGroupService, PresentGroupService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Register seeders and orchestrator
+builder.Services.AddScoped<ISeeder, RoleSeeder>();
+builder.Services.AddScoped<ISeeder, UserSeeder>();
+builder.Services.AddScoped<ISeeder, UserRoleSeeder>();
+builder.Services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
@@ -72,6 +79,12 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
@@ -91,3 +104,5 @@ app.MapControllers();
 app.MapDefaultEndpoints();
 
 app.Run();
+
+
