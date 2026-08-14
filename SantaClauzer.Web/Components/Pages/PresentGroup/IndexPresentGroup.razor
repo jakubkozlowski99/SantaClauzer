@@ -1,6 +1,8 @@
 ﻿@page "/present-groups"
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin, User")]
 
 <h3>Present Groups</h3>
 
@@ -18,7 +20,7 @@ else
             <li>
                 <a class="btn btn-secondary" href="/present-groups/update/@group.Id">Update</a>
                 <AuthorizeView Roles="Admin">
-                    <Authorized>
+                    <Authorized Context="deleteAuth">
                         <button class="btn btn-danger" @onclick="() => { DeleteId = group.Id; AppModal.OpenModal(); }">Delete</button>
                     </Authorized>
                 </AuthorizeView>

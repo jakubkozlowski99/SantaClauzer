@@ -8,7 +8,6 @@ using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace SantaClauzer.ApiService.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PresentGroupController : ControllerBase
