@@ -3,10 +3,11 @@
 @using SantaClauzer.Model.Models
 @using SantaClauzer.Web.Authentication
 @using SantaClauzer.Web.Components.Layout
-@layout EmptyLayout
+@using SantaClauzer.Web.Services
 @inject ApiClient ApiClient
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
+@inject NotificationState NotificationState
 @rendermode InteractiveServer
 
 <div class="p-5">
@@ -33,7 +34,12 @@
         if (result != null && result.Token != null)
         {
             await ((CustomAuthStateProvider)AuthStateProvider).MarkUserAsAuthenticated(result);
+            NotificationState.SetSuccess("Login successful.");
             Navigation.NavigateTo("/");
+        }
+        else
+        {
+            NotificationState.SetError("Login failed. Check your credentials.");
         }
     }
 }

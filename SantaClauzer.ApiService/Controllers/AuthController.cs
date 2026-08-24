@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SantaClauzer.BL.Services;
@@ -12,12 +14,21 @@ namespace SantaClauzer.ApiService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IConfiguration configuration, IAuthService authService) : ControllerBase
+    public class AuthController : ControllerBase
     {
+        private readonly IAuthService authService;
+        private readonly IConfiguration configuration;
+
+        public AuthController(IAuthService authService, IConfiguration configuration)
+        {
+            this.authService = authService;
+            this.configuration = configuration;
+        }
+
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseModel>> Login([FromBody] LoginModel loginModel)
         {
-            var user = await authService.GetUserByLogin(loginModel.Username, loginModel.Password);
+            var user = await authService.GetUserByUserName(loginModel.Username, loginModel.Password);
             if (user != null)
             {
                 var token = GenerateJwtToken(user, isRefreshToken:false);
@@ -35,7 +46,32 @@ namespace SantaClauzer.ApiService.Controllers
                     TokenExpired = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds()
                 });
             }
-            return null;
+            return Unauthorized();
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<RegisterResponseModel>> Register([FromBody] RegisterModel registerModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new RegisterResponseModel { Success = false });
+            }
+
+            bool isUsernameTaken = await authService.CheckIfUserExists(registerModel.Username);
+            if (isUsernameTaken)
+            {
+                return BadRequest(new RegisterResponseModel { Success = false });
+            }
+
+            var newUser = new UserModel
+            {
+                UserName = registerModel.Username,
+                Email = registerModel.Email
+            };
+
+            await authService.RegisterUser(newUser, registerModel.Password);
+
+            return Ok(new RegisterResponseModel { Success = true });
         }
 
         [HttpGet("loginByRefreshToken")]
@@ -44,7 +80,7 @@ namespace SantaClauzer.ApiService.Controllers
             var refreshTokenModel = await authService.GetRefreshTokenModel(refreshToken);
             if (refreshTokenModel == null)
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return BadRequest();
             }
 
             var newToken = GenerateJwtToken(refreshTokenModel.User, isRefreshToken:false);

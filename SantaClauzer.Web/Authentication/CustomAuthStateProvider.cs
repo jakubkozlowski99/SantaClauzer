@@ -35,7 +35,11 @@ namespace SantaClauzer.Web.Authentication
 
         public async Task MarkUserAsLoggedOut()
         {
+            // remove the same key used when signing in
+            await localStorage.DeleteAsync("sessionState");
+            // if you used an additional raw token key, delete it too:
             await localStorage.DeleteAsync("authToken");
+
             var identity = new ClaimsIdentity();
             var user = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));

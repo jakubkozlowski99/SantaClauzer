@@ -1,5 +1,44 @@
 ﻿@page "/register"
+@using SantaClauzer.Model.Models
+@using SantaClauzer.Web.Services
+@inject ApiClient ApiClient
+@inject NavigationManager Navigation
+@inject NotificationState NotificationState
+@rendermode InteractiveServer
+
+<div class="p-5">
+    <EditForm Model="registerModel" FormName="Register" OnValidSubmit="HandleRegister">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="Username">Username</label>
+            <InputText id="Username" class="form-control" @bind-Value="registerModel.Username" />
+        </div>
+        <div class="form-group">
+            <label for="Email">Email</label>
+            <InputText id="Email" type="email" class="form-control" @bind-Value="registerModel.Email" />
+        </div>
+        <div class="form-group">
+            <label for="Password">Password</label>
+            <InputText id="Password" type="password" class="form-control" @bind-Value="registerModel.Password" />
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Register</button>
+    </EditForm>
+</div>
 
 @code {
+    private RegisterModel registerModel = new RegisterModel();
 
+    private async Task HandleRegister()
+    {
+        var result = await ApiClient.PostAsync<RegisterResponseModel, RegisterModel>("api/auth/register", registerModel);
+        if (result != null && result.Success)
+        {
+            NotificationState.SetSuccess("Registration successful.");
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            NotificationState.SetInfo("Registration failed. Please try again.");
+        }
+    }
 }

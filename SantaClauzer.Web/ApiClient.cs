@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Newtonsoft.Json;
@@ -7,7 +8,7 @@ using System.Net.Http.Headers;
 
 namespace SantaClauzer.Web;
 
-public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage, AuthenticationStateProvider authStateProvider)
+public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage, AuthenticationStateProvider authStateProvider, NavigationManager navigationManager)
 {
     public async Task SetAuthorizeHeader()
     {
@@ -17,6 +18,7 @@ public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage
             if (sessionState.TokenExpired < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 await ((CustomAuthStateProvider)authStateProvider).MarkUserAsLoggedOut();
+                navigationManager.NavigateTo("/login");
             }
             else if (sessionState.TokenExpired < DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds())
             {
@@ -29,6 +31,7 @@ public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage
                 else
                 {
                     await ((CustomAuthStateProvider)authStateProvider).MarkUserAsLoggedOut();
+                    navigationManager.NavigateTo("/login");
                 }
             }
             else

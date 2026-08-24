@@ -13,10 +13,16 @@
     <main>
         <div class="top-row px-4">
             <AuthorizeView>
-                <Authorized>Hello @context.User.Identity?.Name!</Authorized>
-                <NotAuthorized>You are not logged in</NotAuthorized>
+                <Authorized>
+                    Hello @context.User.Identity?.Name!
+                    <a href="/logout">Log out</a>
+                </Authorized>
+                <NotAuthorized>
+                    You are not logged in
+                    <a href="/login">Log in</a>
+                    <a href="/register">Register</a>
+                </NotAuthorized>
             </AuthorizeView>
-            <a href="/logout">Log out</a>
         </div>
 
         <article class="content px-4">

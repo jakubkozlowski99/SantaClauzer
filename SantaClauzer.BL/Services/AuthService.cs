@@ -1,10 +1,6 @@
-﻿using Microsoft.Identity.Client;
+﻿using Microsoft.AspNetCore.Identity;
 using SantaClauzer.BL.Repositories;
 using SantaClauzer.Model.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SantaClauzer.BL.Services
@@ -12,27 +8,76 @@ namespace SantaClauzer.BL.Services
     public interface IAuthService
     {
         Task AddRefreshTokenModel(RefreshTokenModel refreshToken);
+        Task<bool> CheckIfUserExists(string username);
         Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken);
-        Task<UserModel> GetUserByLogin(string username, string password);
+        Task<UserModel> GetUserByUserName(string username, string password);
+        Task RegisterUser (UserModel user, string password);
     }
-    public class AuthService(IAuthRepository authRepository) : IAuthService
+
+    public class AuthService : IAuthService
     {
+        private readonly IAuthRepository _authRepository;
+        private readonly IRoleService _roleService;
+        private readonly IUserRoleService _userRoleService;
+        private readonly PasswordHasher<UserModel> _passwordHasher = new PasswordHasher<UserModel>();
+
+        public AuthService(IAuthRepository authRepository, IRoleService roleService, IUserRoleService userRoleService)
+        {
+            _authRepository = authRepository;
+            _roleService = roleService;
+            _userRoleService = userRoleService;
+        }
+
         public async Task AddRefreshTokenModel(RefreshTokenModel refreshToken)
         {
-            await authRepository.RemoveRefreshTokenByUserID(refreshToken.UserId);
-            await authRepository.AddRefreshTokenModel(refreshToken);
+            await _authRepository.RemoveRefreshTokenByUserID(refreshToken.UserId);
+            await _authRepository.AddRefreshTokenModel(refreshToken);
+        }
+
+        public async Task<bool> CheckIfUserExists(string username)
+        {
+            var user = await _authRepository.GetUserByUserName(username);
+            if (user != null)
+            {
+                return true;
+            }
+            return false;
         }
 
         public Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken)
         {
-            return authRepository.GetRefreshTokenModel(refreshToken);
+            return _authRepository.GetRefreshTokenModel(refreshToken);
         }
 
-        public Task<UserModel> GetUserByLogin(string username, string password)
+        public async Task<UserModel> GetUserByUserName(string username, string password)
         {
-            var user = authRepository.GetUserByLogin(username, password);
+            var user = await _authRepository.GetUserByUserName(username);
+            if (user == null) return null;
 
-            return user;
+            var verification = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            if (verification == PasswordVerificationResult.Success || verification == PasswordVerificationResult.SuccessRehashNeeded)
+                return user;
+
+            return null;
+        }
+
+        public async Task RegisterUser(UserModel user, string password)
+        {
+            user.PasswordHash = _passwordHasher.HashPassword(user, password);
+
+            await _authRepository.RegisterUser(user);
+
+            // Assign default role to the user
+            var defaultRole = await _roleService.GetRoleByName("User");
+            if (defaultRole != null)
+            {
+                var userRole = new UserRoleModel
+                {
+                    UserId = user.Id,
+                    RoleId = defaultRole.Id
+                };
+                await _userRoleService.AddUserRole(userRole);
+            }
         }
     }
 }

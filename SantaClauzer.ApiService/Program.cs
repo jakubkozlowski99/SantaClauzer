@@ -63,6 +63,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPresentGroupRepository, PresentGroupRepository>();
 builder.Services.AddScoped<IPresentGroupService, PresentGroupService>();
 
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -104,5 +110,6 @@ app.MapControllers();
 app.MapDefaultEndpoints();
 
 app.Run();
+
 
 

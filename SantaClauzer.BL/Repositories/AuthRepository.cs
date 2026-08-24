@@ -11,7 +11,8 @@ namespace SantaClauzer.BL.Repositories
 {
     public interface IAuthRepository
     {
-        Task<UserModel> GetUserByLogin(string username, string password);
+        Task RegisterUser (UserModel user);
+        Task<UserModel> GetUserByUserName(string username);
         Task RemoveRefreshTokenByUserID(int userId);
         Task AddRefreshTokenModel(RefreshTokenModel refreshToken);
         Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken);
@@ -24,14 +25,20 @@ namespace SantaClauzer.BL.Repositories
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task RegisterUser(UserModel user)
+        {
+            await dbContext.Users.AddAsync(user);
+            await dbContext.SaveChangesAsync();
+        }
+
         public Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken)
         {
             return dbContext.RefreshTokens.Include(rt => rt.User).ThenInclude(rt => rt.UserRoles).ThenInclude(rt => rt.Role).FirstOrDefaultAsync(rt => rt.RefreshToken == refreshToken);
         }
 
-        public Task<UserModel> GetUserByLogin(string username, string password)
+        public async Task<UserModel> GetUserByUserName(string username)
         {
-            return dbContext.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(u => u.UserName == username && u.Password == password);
+            return await dbContext.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         public async Task RemoveRefreshTokenByUserID(int userId)

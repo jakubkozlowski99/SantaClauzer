@@ -29,6 +29,15 @@ namespace SantaClauzer.Web.Services
             ToastAdded?.Invoke(_pending!);
         }
 
+        public void SetError(string message, string title = "Error")
+        {
+            lock (_sync)
+            {
+                _pending = new PendingToast(NotificationType.Error, title, message);
+            }
+            ToastAdded?.Invoke(_pending!);
+        }
+
         public PendingToast? Consume()
         {
             lock (_sync)
