@@ -23,7 +23,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>
 
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
-        client.BaseAddress = new("https+http://localhost:7422");
+        client.BaseAddress = new Uri("https://localhost:7422");
     });
 
 var app = builder.Build();

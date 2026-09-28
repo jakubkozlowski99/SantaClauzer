@@ -102,11 +102,18 @@ namespace SantaClauzer.ApiService.Controllers
 
         private string GenerateJwtToken(UserModel user, bool isRefreshToken)
         {
+            // include user id so API controllers can read it from claims (NameIdentifier / "sub")
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName)
             };
-            claims.AddRange(user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.Role.Name)));
+
+            if (user.UserRoles != null)
+            {
+                claims.AddRange(user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.Role.Name)));
+            }
 
             string secret = configuration.GetValue<string>($"Jwt:{(isRefreshToken ? "RefreshTokenSecret" : "Secret")}");
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secret));
@@ -122,6 +129,16 @@ namespace SantaClauzer.ApiService.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        //public UserModel GetCurrentUser()
+        //{
+        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+        //    if (int.TryParse(userIdClaim, out var userId))
+        //    {
+        //        return authService.GetUserById(userId).Result;
+        //    }
+        //    return null;
+        //}
 
     }
 }

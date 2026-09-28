@@ -5,6 +5,7 @@ using SantaClauzer.BL.Services;
 using SantaClauzer.Model.Entities;
 using SantaClauzer.Model.Models;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
+using System.Security.Claims;
 
 namespace SantaClauzer.ApiService.Controllers
 {
@@ -13,10 +14,14 @@ namespace SantaClauzer.ApiService.Controllers
     public class PresentGroupController : ControllerBase
     {
         private readonly IPresentGroupService _presentGroupService;
+        private readonly IAuthService _authService;
+        private readonly IPresentGroupUserService _presentGroupUserService;
 
-        public PresentGroupController(IPresentGroupService presentGroupService)
+        public PresentGroupController(IPresentGroupService presentGroupService, IAuthService authService, IPresentGroupUserService presentGroupUserService)
         {
             _presentGroupService = presentGroupService;
+            _authService = authService;
+            _presentGroupUserService = presentGroupUserService;
         }
 
         [HttpGet]
@@ -30,11 +35,26 @@ namespace SantaClauzer.ApiService.Controllers
             });
         }
 
+        // require auth and populate CreatorId from JWT
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<BaseResponseModel>> CreatePresentGroup(PresentGroupModel model)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (int.TryParse(userIdClaim, out var userId))
+            {
+                model.CreatorId = userId;
+            }
+
             await _presentGroupService.CreatePresentGroup(model);
-            return Ok(new BaseResponseModel { Success = true });
+            await _presentGroupUserService.AddPresentGroupUser(new PresentGroupUserModel
+            {
+                UserId = model.CreatorId,
+                PresentGroupId = model.Id,
+                InvitationAccepted = true
+            });
+
+            return Ok(new BaseResponseModel { Success = true, Data = model });
         }
 
         [HttpGet("{id}")]
@@ -45,6 +65,7 @@ namespace SantaClauzer.ApiService.Controllers
             {
                 return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Present group not found." });
             }
+
             return Ok(new BaseResponseModel { Success = true, Data = presentGroup });
         }
 

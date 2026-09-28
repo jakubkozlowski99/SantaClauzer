@@ -6,13 +6,20 @@ using SantaClauzer.BL.Repositories;
 using SantaClauzer.BL.Services;
 using SantaClauzer.Database.Data;
 using SantaClauzer.Database.Seeders;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+.AddJsonOptions(opts =>
+ {
+     opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+     opts.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+ });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -60,8 +67,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddAuthorization();
 
+// PresentGroup registrations
 builder.Services.AddScoped<IPresentGroupRepository, PresentGroupRepository>();
 builder.Services.AddScoped<IPresentGroupService, PresentGroupService>();
+
+// Register the missing PresentGroupUser services/repositories
+builder.Services.AddScoped<IPresentGroupUserRepository, PresentGroupUserRepository>();
+builder.Services.AddScoped<IPresentGroupUserService, PresentGroupUserService>();
 
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();

@@ -21,6 +21,7 @@ namespace SantaClauzer.Database.Data
         public DbSet<RoleModel> Roles { get; set; }
         public DbSet<UserRoleModel> UserRoles { get; set; }
         public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+        public DbSet<PresentGroupUserModel> PresentGroupUsers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -1,0 +1,83 @@
+﻿@page "/present-groups/details/{Id:int}"
+@using SantaClauzer.Model.Entities
+@using SantaClauzer.Model.Models
+@using SantaClauzer.Web.Services
+
+<h3>Present Group Details</h3>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (notFound)
+{
+    <div class="alert alert-warning">Present group not found.</div>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4 class="card-title">@Model.Name</h4>
+            <p class="card-text">@Model.Description</p>
+
+            <dl class="row">
+                <dt class="col-sm-3">Creator</dt>
+                <dd class="col-sm-9">
+                    @{
+                        if (Model.Creator != null)
+                        {
+                            <text>@Model.Creator.UserName</text>;
+                        }
+                        else
+                        {
+                            <em>Unknown</em>
+                        }
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Created At</dt>
+                <dd class="col-sm-9">@Model.CreatedAt.ToString("g")</dd>
+
+                <dt class="col-sm-3">Budget</dt>
+                <dd class="col-sm-9">@Model.Budget</dd>
+
+                <dt class="col-sm-3">Wish List Items</dt>
+                <dd class="col-sm-9">
+                    @if (Model.WishLists is null || !Model.WishLists.Any())
+                    {
+                        <em>No wishes</em>
+                    }
+                    else
+                    {
+                        <ul>
+                            @foreach (var w in Model.WishLists)
+                            {
+                                <li>@w.Content</li>
+                            }
+                        </ul>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Members</dt>
+                <dd class="col-sm-9">
+                    @if (Model.PresentGroupUsers is null || !Model.PresentGroupUsers.Any())
+                    {
+                        <em>No members</em>
+                    }
+                    else
+                    {
+                        <ul>
+                            @foreach (var m in Model.PresentGroupUsers)
+                            {
+                                <li>@(m.User?.UserName ?? $"#{m.UserId}")</li>
+                            }
+                        </ul>
+                    }
+                </dd>
+            </dl>
+
+            <button class="btn btn-secondary" @onclick="@(() => NavigationManager.NavigateTo("/present-groups"))">Back</button>
+            <a class="btn btn-outline-primary ms-2" href="@($"/present-groups/update/{Id}")">Edit</a>
+        </div>
+    </div>
+}

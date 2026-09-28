@@ -13,6 +13,7 @@ namespace SantaClauzer.BL.Repositories
     {
         Task RegisterUser (UserModel user);
         Task<UserModel> GetUserByUserName(string username);
+        Task<UserModel> GetUserById(int userId);
         Task RemoveRefreshTokenByUserID(int userId);
         Task AddRefreshTokenModel(RefreshTokenModel refreshToken);
         Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken);
@@ -39,6 +40,11 @@ namespace SantaClauzer.BL.Repositories
         public async Task<UserModel> GetUserByUserName(string username)
         {
             return await dbContext.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(u => u.UserName == username);
+        }
+
+        public async Task<UserModel> GetUserById(int userId)
+        {
+            return await dbContext.Users.Include(ur => ur.UserRoles).ThenInclude(r => r.Role).FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task RemoveRefreshTokenByUserID(int userId)

@@ -10,12 +10,18 @@ namespace SantaClauzer.Model.Entities
         public string Email { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
+        public string Salt { get; set; } = string.Empty;
 
         // navigation: user's refresh tokens
         public ICollection<RefreshTokenModel> RefreshTokens { get; set; } = new List<RefreshTokenModel>();
 
         // navigation: roles assigned to the user via join table
         public ICollection<UserRoleModel> UserRoles { get; set; } = new List<UserRoleModel>();
+
+        // present groups created by this user (ownership)
         public ICollection<PresentGroupModel> PresentGroups { get; set; } = new List<PresentGroupModel>();
+
+        // many-to-many membership relation: groups this user belongs to
+        public ICollection<PresentGroupUserModel> PresentGroupUsers { get; set; } = new List<PresentGroupUserModel>();
     }
 }

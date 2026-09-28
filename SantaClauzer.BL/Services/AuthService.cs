@@ -11,6 +11,7 @@ namespace SantaClauzer.BL.Services
         Task<bool> CheckIfUserExists(string username);
         Task<RefreshTokenModel> GetRefreshTokenModel(string refreshToken);
         Task<UserModel> GetUserByUserName(string username, string password);
+        Task<UserModel> GetUserById(int userId);
         Task RegisterUser (UserModel user, string password);
     }
 
@@ -78,6 +79,11 @@ namespace SantaClauzer.BL.Services
                 };
                 await _userRoleService.AddUserRole(userRole);
             }
+        }
+
+        public async Task<UserModel> GetUserById(int userId)
+        {
+            return await _authRepository.GetUserById(userId);
         }
     }
 }
