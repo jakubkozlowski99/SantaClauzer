@@ -97,5 +97,12 @@ namespace SantaClauzer.ApiService.Controllers
             await _presentGroupService.DeletePresentGroup(id);
             return Ok(new BaseResponseModel { Success = true });
         }
+
+        [HttpGet("{presentGroupId}/users")]
+        public async Task<ActionResult<BaseResponseModel>> GetUsersInPresentGroup(int presentGroupId)
+        {
+            var users = await _presentGroupUserService.GetUsersInPresentGroup(presentGroupId);
+            return Ok(new BaseResponseModel { Success = true, Data = users });
+        }
     }
 }

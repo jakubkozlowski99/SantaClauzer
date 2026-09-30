@@ -11,6 +11,7 @@ namespace SantaClauzer.BL.Services
     public interface IPresentGroupUserService
     {
         Task<PresentGroupUserModel> AddPresentGroupUser(PresentGroupUserModel presentGroupUser);
+        Task<List<UserModel>> GetUsersInPresentGroup(int presentGroupId);
     }
     public class PresentGroupUserService : IPresentGroupUserService
     {
@@ -22,6 +23,10 @@ namespace SantaClauzer.BL.Services
         public async Task<PresentGroupUserModel> AddPresentGroupUser(PresentGroupUserModel presentGroupUser)
         {
             return await _presentGroupUserRepository.AddPresentGroupUser(presentGroupUser);
+        }
+        public async Task<List<UserModel>> GetUsersInPresentGroup(int presentGroupId)
+        {
+            return await _presentGroupUserRepository.GetUsersInPresentGroup(presentGroupId);
         }
     }
 }

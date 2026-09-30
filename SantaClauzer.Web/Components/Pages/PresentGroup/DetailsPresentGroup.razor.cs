@@ -16,6 +16,8 @@ namespace SantaClauzer.Web.Components.Pages.PresentGroup
         private bool isLoading = true;
         private bool notFound = false;
 
+        private List<UserModel> members { get; set; } = new List<UserModel>();
+
         [Inject]
         public ApiClient apiClient { get; set; }
 
@@ -35,10 +37,10 @@ namespace SantaClauzer.Web.Components.Pages.PresentGroup
 
             try
             {
-                var res = await apiClient.GetFromJsonAsync<BaseResponseModel>($"/api/PresentGroup/{Id}");
-                if (res != null && res.Success)
+                var presentGroupResult = await apiClient.GetFromJsonAsync<BaseResponseModel>($"/api/PresentGroup/{Id}");
+                if (presentGroupResult != null && presentGroupResult.Success)
                 {
-                    Model = JsonConvert.DeserializeObject<PresentGroupModel>(res.Data.ToString()) ?? new PresentGroupModel();
+                    Model = JsonConvert.DeserializeObject<PresentGroupModel>(presentGroupResult.Data.ToString()) ?? new PresentGroupModel();
 
                     if (Model != null && Model.CreatorId != null)
                     {
@@ -53,6 +55,12 @@ namespace SantaClauzer.Web.Components.Pages.PresentGroup
                 else
                 {
                     notFound = true;
+                }
+
+                var presentGroupUsersResult = await apiClient.GetFromJsonAsync<BaseResponseModel>($"/api/PresentGroup/{Id}/users");
+                if (presentGroupUsersResult != null && presentGroupUsersResult.Success)
+                {
+                    members = JsonConvert.DeserializeObject<List<UserModel>>(presentGroupUsersResult.Data.ToString()) ?? new List<UserModel>();
                 }
             }
             catch
