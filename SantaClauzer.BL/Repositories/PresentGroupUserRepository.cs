@@ -1,4 +1,5 @@
-﻿using SantaClauzer.Database.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SantaClauzer.Database.Data;
 using SantaClauzer.Model.Entities;
 using System;
 using System.Collections.Generic;
@@ -28,10 +29,10 @@ namespace SantaClauzer.BL.Repositories
         }
         public async Task<List<UserModel>> GetUsersInPresentGroup(int presentGroupId)
         {
-            var users = await Task.Run(() => _appDbContext.PresentGroupUsers
+            var users = await _appDbContext.PresentGroupUsers
                 .Where(pgu => pgu.PresentGroupId == presentGroupId)
                 .Select(pgu => pgu.User)
-                .ToList());
+                .ToListAsync();
             return users;
         }
     }

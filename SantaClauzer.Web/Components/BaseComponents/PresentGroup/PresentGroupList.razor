@@ -1,0 +1,37 @@
+﻿@using System.Linq
+@using Microsoft.AspNetCore.Components.Authorization
+@using SantaClauzer.Model.Entities
+@inject NavigationManager NavigationManager
+
+@if (Groups == null || !Groups.Any())
+{
+    <p>No present groups found.</p>
+}
+else
+{
+    @if (ShowCreateButton)
+    {
+        <a class="btn btn-primary mb-2" href="@CreateUrl">Create New Present Group</a>
+    }
+
+    <ul>
+        @foreach (var group in Groups)
+        {
+            <li>@group.Name</li>
+            <li>
+                <a class="btn btn-secondary" href="@($"/present-groups/update/{group.Id}")">Update</a>
+
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <button class="btn btn-danger" @onclick="() => OnDeleteRequested.InvokeAsync(group.Id)">Delete</button>
+                    </Authorized>
+                </AuthorizeView>
+
+                <a class="btn btn-secondary" href="@($"/present-groups/details/{group.Id}")">Details</a>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+}

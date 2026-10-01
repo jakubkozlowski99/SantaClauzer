@@ -1,11 +1,10 @@
-﻿@page "/present-groups"
+﻿@page "/present-groups/mine"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
 @using SantaClauzer.Web.Components.BaseComponents.PresentGroup
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Admin, User")]
 
-<h3>Present Groups</h3>
+<h3>My Present Groups</h3>
 
 @if (PresentGroupModels == null)
 {
@@ -13,7 +12,8 @@
 }
 else
 {
-    <PresentGroupList Groups="PresentGroupModels" OnDeleteRequested="HandleDeleteRequested" CreateUrl="/present-groups/create" />
+    <!-- hide the create button for this page -->
+    <PresentGroupList Groups="PresentGroupModels" OnDeleteRequested="HandleDeleteRequested" ShowCreateButton="false" />
 }
 
 <AppModal @ref="AppModal">

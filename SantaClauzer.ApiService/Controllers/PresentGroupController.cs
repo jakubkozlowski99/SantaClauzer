@@ -104,5 +104,12 @@ namespace SantaClauzer.ApiService.Controllers
             var users = await _presentGroupUserService.GetUsersInPresentGroup(presentGroupId);
             return Ok(new BaseResponseModel { Success = true, Data = users });
         }
+
+        [HttpGet("groups-by-user/{userId}")]
+        public async Task<ActionResult<BaseResponseModel>> GetPresentGroupsByUser(int userId)
+        {
+            var presentGroups = await _presentGroupService.GetPresentGroupsByUser(userId);
+            return Ok(new BaseResponseModel { Success = true, Data = presentGroups });
+        }
     }
 }

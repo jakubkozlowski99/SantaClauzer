@@ -14,7 +14,7 @@ namespace SantaClauzer.Web.Components.Pages.PresentGroup
         [Inject]
         private NotificationState NotificationState { get; set; } = default!;
         public List<PresentGroupModel> PresentGroupModels { get; set; } = new List<PresentGroupModel>();
-        public AppModal AppModal { get; set; }
+        public AppModal AppModal { get; set; } = default!;
         public int DeleteId { get; set; }
 
         protected override async Task OnInitializedAsync()
@@ -30,6 +30,12 @@ namespace SantaClauzer.Web.Components.Pages.PresentGroup
             {
                 PresentGroupModels = JsonConvert.DeserializeObject<List<PresentGroupModel>>(res.Data.ToString()) ?? new List<PresentGroupModel>();
             }
+        }
+
+        protected void HandleDeleteRequested(int id)
+        {
+            DeleteId = id;
+            AppModal.OpenModal();
         }
 
         protected async Task HandleDelete()
