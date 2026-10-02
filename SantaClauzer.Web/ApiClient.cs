@@ -53,13 +53,22 @@ public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage
         await SetAuthorizeHeader();
 
         var res = await httpClient.PostAsJsonAsync(path, data);
+        if (res == null)
+            return default;
 
-        if (res != null && res.IsSuccessStatusCode)
+        // read content regardless of HTTP status so callers can inspect error payload
+        var content = await res.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(content))
+            return default;
+
+        try
         {
-            return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<T1>(content);
         }
-
-        return default;
+        catch
+        {
+            return default;
+        }
     }
 
     public async Task<T1> PutAsync<T1, T2>(string path, T2 data)
@@ -67,11 +76,21 @@ public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage
         await SetAuthorizeHeader();
 
         var res = await httpClient.PutAsJsonAsync(path, data);
-        if (res != null && res.IsSuccessStatusCode)
+        if (res == null)
+            return default;
+
+        var content = await res.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(content))
+            return default;
+
+        try
         {
-            return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<T1>(content);
         }
-        return default;
+        catch
+        {
+            return default;
+        }
     }
 
     public async Task<T1> DeleteAsync<T1>(string path)
@@ -79,10 +98,20 @@ public class ApiClient(HttpClient httpClient, ProtectedLocalStorage localStorage
         await SetAuthorizeHeader();
 
         var res = await httpClient.DeleteAsync(path);
-        if (res != null && res.IsSuccessStatusCode)
+        if (res == null)
+            return default;
+
+        var content = await res.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(content))
+            return default;
+
+        try
         {
-            return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<T1>(content);
         }
-        return default;
+        catch
+        {
+            return default;
+        }
     }
 }

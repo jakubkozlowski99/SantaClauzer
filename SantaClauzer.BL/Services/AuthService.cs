@@ -13,6 +13,7 @@ namespace SantaClauzer.BL.Services
         Task<UserModel> GetUserByUserName(string username, string password);
         Task<UserModel> GetUserById(int userId);
         Task RegisterUser (UserModel user, string password);
+        Task<UserModel> GetUserByUserNameNoPassword(string username);
     }
 
     public class AuthService : IAuthService
@@ -84,6 +85,11 @@ namespace SantaClauzer.BL.Services
         public async Task<UserModel> GetUserById(int userId)
         {
             return await _authRepository.GetUserById(userId);
+        }
+
+        public async Task<UserModel> GetUserByUserNameNoPassword(string username)
+        {
+            return await _authRepository.GetUserByUserName(username);
         }
     }
 }

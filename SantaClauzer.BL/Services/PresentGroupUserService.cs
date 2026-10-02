@@ -12,6 +12,8 @@ namespace SantaClauzer.BL.Services
     {
         Task<PresentGroupUserModel> AddPresentGroupUser(PresentGroupUserModel presentGroupUser);
         Task<List<UserModel>> GetUsersInPresentGroup(int presentGroupId);
+        Task<bool> CheckIfUserInPresentGroup(int userId, int presentGroupId);
+
     }
     public class PresentGroupUserService : IPresentGroupUserService
     {
@@ -27,6 +29,11 @@ namespace SantaClauzer.BL.Services
         public async Task<List<UserModel>> GetUsersInPresentGroup(int presentGroupId)
         {
             return await _presentGroupUserRepository.GetUsersInPresentGroup(presentGroupId);
+        }
+
+        public async Task<bool> CheckIfUserInPresentGroup(int userId, int presentGroupId)
+        {
+            return await _presentGroupUserRepository.CheckIfUserInPresentGroup(presentGroupId, userId);
         }
     }
 }

@@ -23,15 +23,13 @@ else
             <dl class="row">
                 <dt class="col-sm-3">Creator</dt>
                 <dd class="col-sm-9">
-                    @{
-                        if (Model.Creator != null)
-                        {
-                            <text>@Model.Creator.UserName</text>;
-                        }
-                        else
-                        {
-                            <em>Unknown</em>
-                        }
+                    @if (Model.Creator != null)
+                    {
+                        <text>@Model.Creator.UserName</text>
+                    }
+                    else
+                    {
+                        <em>Unknown</em>
                     }
                 </dd>
 
@@ -78,6 +76,39 @@ else
 
             <button class="btn btn-secondary" @onclick="@(() => NavigationManager.NavigateTo("/present-groups"))">Back</button>
             <a class="btn btn-outline-primary ms-2" href="@($"/present-groups/update/{Id}")">Edit</a>
+
+            @if (isCreator)
+            {
+                <button class="btn btn-danger ms-2" @onclick="ShowDeleteModal">Delete</button>
+                <button class="btn btn-primary ms-2" @onclick="ShowInviteModal">Send Invite</button>
+            }
         </div>
     </div>
 }
+
+<!-- Delete confirmation modal (same behavior as IndexPresentGroup) -->
+<AppModal @ref="DeleteModal">
+    <Title>Notification</Title>
+    <Body>
+        Are you sure you want to delete this present group?
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-primary" style="width:80px" @onclick="ConfirmDelete">Yes</button>
+        <button type="button" class="btn btn-secondary" @onclick="() => DeleteModal.CloseModal()">Cancel</button>
+    </Footer>
+</AppModal>
+
+<!-- Invite modal -->
+<AppModal @ref="InviteModal">
+    <Title>Send Invite</Title>
+    <Body>
+        <div class="mb-3">
+            <label for="inviteUsername" class="form-label">Username</label>
+            <input id="inviteUsername" class="form-control" @bind="inviteUsername" />
+        </div>
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-primary" @onclick="SendInvite">Send</button>
+        <button type="button" class="btn btn-secondary" @onclick="() => InviteModal.CloseModal()">Cancel</button>
+    </Footer>
+</AppModal>

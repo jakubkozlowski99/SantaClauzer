@@ -105,6 +105,43 @@ namespace SantaClauzer.ApiService.Controllers
             return Ok(new BaseResponseModel { Success = true, Data = users });
         }
 
+        [HttpPost("{presentGroupId}/users")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> InviteUserToPresentGroup(int presentGroupId, [FromBody] InviteUserRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Username))
+                return BadRequest(new BaseResponseModel { Success = false, ErrorMessage = "Username is required." });
+
+            var presentGroup = await _presentGroupService.GetPresentGroup(presentGroupId);
+            if (presentGroup == null)
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Present group not found." });
+
+            // ensure caller is the creator
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (!int.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized(new BaseResponseModel { Success = false, ErrorMessage = "Unauthorized" });
+
+            if (presentGroup.CreatorId != callerId)
+                return Forbid();
+
+            var userToInvite = await _authService.GetUserByUserNameNoPassword(request.Username);
+            if (userToInvite == null)
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "User not found." });
+
+            var ifUserExistsInGroup = await _presentGroupUserService.CheckIfUserInPresentGroup(presentGroupId, userToInvite.Id);
+            if (ifUserExistsInGroup)
+                return BadRequest(new BaseResponseModel { Success = false, ErrorMessage = "User is already in the present group or invited." });
+
+            var added = await _presentGroupUserService.AddPresentGroupUser(new PresentGroupUserModel
+            {
+                PresentGroupId = presentGroupId,
+                UserId = userToInvite.Id,
+                InvitationAccepted = false
+            });
+
+            return Ok(new BaseResponseModel { Success = true, Data = added });
+        }
+
         [HttpGet("groups-by-user/{userId}")]
         public async Task<ActionResult<BaseResponseModel>> GetPresentGroupsByUser(int userId)
         {
