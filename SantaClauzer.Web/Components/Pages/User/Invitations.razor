@@ -1,0 +1,47 @@
+﻿@page "/invitations"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using SantaClauzer.Model.Entities
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Invitations</h3>
+
+        @if (isLoading)
+        {
+            <p>Loading...</p>
+        }
+        else if (notFound)
+        {
+            <div class="alert alert-warning">No invitations found.</div>
+        }
+        else if (InvitationsList == null || !InvitationsList.Any())
+        {
+            <p>No active invitations.</p>
+        }
+        else
+        {
+            <ul class="list-group">
+                @foreach (var inv in InvitationsList)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@(inv.PresentGroup?.Name ?? $"Group #{inv.PresentGroupId}")</strong>
+                            <div class="small text-muted">Invited by: @(inv.PresentGroup?.Creator?.UserName ?? "Unknown")</div>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-success me-2" @onclick="() => AcceptInvite(inv.PresentGroupId, inv.UserId)">Accept</button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeclineInvite(inv.PresentGroupId, inv.UserId)">Decline</button>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h3>Invitations</h3>
+        <div class="alert alert-info">You must be logged in to view your invitations.</div>
+    </NotAuthorized>
+</AuthorizeView>
+

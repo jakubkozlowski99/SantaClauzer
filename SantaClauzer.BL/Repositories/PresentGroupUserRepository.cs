@@ -14,6 +14,9 @@ namespace SantaClauzer.BL.Repositories
         Task<PresentGroupUserModel> AddPresentGroupUser(PresentGroupUserModel presentGroupUser);
         Task<List<UserModel>> GetUsersInPresentGroup(int presentGroupId);
         Task<bool> CheckIfUserInPresentGroup(int presentGroupId, int userId);
+        Task<List<PresentGroupUserModel>> GetActiveInvitationsForUser(int userId);
+        Task<PresentGroupUserModel?> AcceptInvitation(int presentGroupId, int userId);
+        Task<bool> RemovePresentGroupUser(int presentGroupId, int userId);
     }
     public class PresentGroupUserRepository : IPresentGroupUserRepository
     {
@@ -54,6 +57,46 @@ namespace SantaClauzer.BL.Repositories
             var exists = await _appDbContext.PresentGroupUsers
                 .AnyAsync(pgu => pgu.PresentGroupId == presentGroupId && pgu.UserId == userId);
             return exists;
+        }
+
+        public async Task<List<PresentGroupUserModel>> GetActiveInvitationsForUser(int userId)
+        {
+            var invitations = await _appDbContext.PresentGroupUsers
+                .Where(pgu => pgu.UserId == userId && pgu.InvitationAccepted == false)
+                .Include(pgu => pgu.PresentGroup)
+                .ThenInclude(pg => pg.Creator) // include creator if useful
+                .ToListAsync();
+            return invitations;
+        }
+
+        public async Task<PresentGroupUserModel?> AcceptInvitation(int presentGroupId, int userId)
+        {
+            var pgu = await _appDbContext.PresentGroupUsers
+                .FirstOrDefaultAsync(p => p.PresentGroupId == presentGroupId && p.UserId == userId);
+
+            if (pgu == null)
+                return null;
+
+            if (pgu.InvitationAccepted)
+                return pgu;
+
+            pgu.InvitationAccepted = true;
+            _appDbContext.PresentGroupUsers.Update(pgu);
+            await _appDbContext.SaveChangesAsync();
+            return pgu;
+        }
+
+        public async Task<bool> RemovePresentGroupUser(int presentGroupId, int userId)
+        {
+            var pgu = await _appDbContext.PresentGroupUsers
+                .FirstOrDefaultAsync(p => p.PresentGroupId == presentGroupId && p.UserId == userId);
+
+            if (pgu == null)
+                return false;
+
+            _appDbContext.PresentGroupUsers.Remove(pgu);
+            await _appDbContext.SaveChangesAsync();
+            return true;
         }
     }
 }

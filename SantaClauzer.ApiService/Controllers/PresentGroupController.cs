@@ -128,7 +128,7 @@ namespace SantaClauzer.ApiService.Controllers
             if (userToInvite == null)
                 return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "User not found." });
 
-            var ifUserExistsInGroup = await _presentGroupUserService.CheckIfUserInPresentGroup(presentGroupId, userToInvite.Id);
+            var ifUserExistsInGroup = await _presentGroupUserService.CheckIfUserInPresentGroup(userToInvite.Id, presentGroupId);
             if (ifUserExistsInGroup)
                 return BadRequest(new BaseResponseModel { Success = false, ErrorMessage = "User is already in the present group or invited." });
 
@@ -147,6 +147,56 @@ namespace SantaClauzer.ApiService.Controllers
         {
             var presentGroups = await _presentGroupService.GetPresentGroupsByUser(userId);
             return Ok(new BaseResponseModel { Success = true, Data = presentGroups });
+        }
+
+        [HttpGet("invitations/{userId}")]
+        public async Task<ActionResult<BaseResponseModel>> GetActiveInvitationsForUser(int userId)
+        {
+            var invitations = await _presentGroupUserService.GetActiveInvitationsForUser(userId);
+            return Ok(new BaseResponseModel { Success = true, Data = invitations });
+        }
+
+        // Accept an invitation (only the invited user may accept)
+        [HttpPost("{presentGroupId}/users/{userId}/accept")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> AcceptInvitation(int presentGroupId, int userId)
+        {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (!int.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized(new BaseResponseModel { Success = false, ErrorMessage = "Unauthorized" });
+
+            if (callerId != userId)
+                return Forbid();
+
+            var success = await _presentGroupUserService.AcceptInvitation(presentGroupId, userId);
+            if (success == null)
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Invitation not found." });
+
+            return Ok(new BaseResponseModel { Success = true, Data = success });
+        }
+
+        // Decline invitation or remove membership (invited user can decline; creator or admin can remove)
+        [HttpDelete("{presentGroupId}/users/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> RemovePresentGroupUser(int presentGroupId, int userId)
+        {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            if (!int.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized(new BaseResponseModel { Success = false, ErrorMessage = "Unauthorized" });
+
+            var presentGroup = await _presentGroupService.GetPresentGroup(presentGroupId);
+            if (presentGroup == null)
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Present group not found." });
+
+            // allow invited user to decline (caller == userId) or group creator to remove
+            if (callerId != userId && presentGroup.CreatorId != callerId)
+                return Forbid();
+
+            var removed = await _presentGroupUserService.RemovePresentGroupUser(presentGroupId, userId);
+            if (!removed)
+                return NotFound(new BaseResponseModel { Success = false, ErrorMessage = "Invitation/membership not found." });
+
+            return Ok(new BaseResponseModel { Success = true });
         }
     }
 }

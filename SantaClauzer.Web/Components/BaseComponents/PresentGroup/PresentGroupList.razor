@@ -21,11 +21,19 @@ else
             <li>
                 <a class="btn btn-secondary" href="@($"/present-groups/update/{group.Id}")">Update</a>
 
-                <AuthorizeView Roles="Admin">
-                    <Authorized>
-                        <button class="btn btn-danger" @onclick="() => OnDeleteRequested.InvokeAsync(group.Id)">Delete</button>
-                    </Authorized>
-                </AuthorizeView>
+                @* Show delete to the group creator; otherwise fall back to showing to Admins *@
+                @if (CurrentUserId.HasValue && group.CreatorId == CurrentUserId.Value)
+                {
+                    <button class="btn btn-danger" @onclick="() => OnDeleteRequested.InvokeAsync(group.Id)">Delete</button>
+                }
+                else
+                {
+                    <AuthorizeView Roles="Admin">
+                        <Authorized>
+                            <button class="btn btn-danger" @onclick="() => OnDeleteRequested.InvokeAsync(group.Id)">Delete</button>
+                        </Authorized>
+                    </AuthorizeView>
+                }
 
                 <a class="btn btn-secondary" href="@($"/present-groups/details/{group.Id}")">Details</a>
             </li>
